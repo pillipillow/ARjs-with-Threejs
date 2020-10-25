@@ -118,10 +118,10 @@
             var videoMaterial = new THREE.MeshBasicMaterial({map : videoTexture});
            
             // Place the model
-            const loader = new GLTFLoader().setPath("../assets/models/");
+            const loader = new GLTFLoader();
 
             loader.load(
-                "bird.glb",
+                "assets/models/bird.glb",
                 function(gltf)
                 {
                     model = gltf.scene.children[0];
