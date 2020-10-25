@@ -118,7 +118,7 @@
             var videoMaterial = new THREE.MeshBasicMaterial({map : videoTexture});
            
             // Place the model
-            const loader = new GLTFLoader();
+            /*const loader = new GLTFLoader();
 
             loader.load(
                 "assets/models/bird.glb",
@@ -144,7 +144,13 @@
                 {
                     console.log( 'An error happened' );
                 }
-            )
+            )*/
+
+            var geometry = new THREE.BoxGeometry(30,30,30);
+            var material = new THREE.MeshBasicMaterial({color : 0xFF0000});
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(150,150,-150);
+            markerRoot.add(mesh);
         }
 
         function update()
