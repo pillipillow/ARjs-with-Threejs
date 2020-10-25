@@ -12,7 +12,7 @@
     <script>THREEx.ArToolkitContext.baseURL = "libs/arJS/"</script>
 
     <script type= "module">
-        import { GLTFLoader } from '../libs/jsm/GLTFLoader.js';
+        import { GLTFLoader } from '/libs/jsm/GLTFLoader.js';
         
         var scene, camera, renderer, clock;
 
@@ -118,10 +118,10 @@
             var videoMaterial = new THREE.MeshBasicMaterial({map : videoTexture});
            
             // Place the model
-            const loader = new GLTFLoader();
+            const loader = new GLTFLoader().setPath("../assets/models/");
 
             loader.load(
-                "assets/models/bird.glb",
+                "bird.glb",
                 function(gltf)
                 {
                     model = gltf.scene.children[0];
