@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Viewport</title>
+    <link rel ="stylesheet" href="css/main.css">
+</head>
+<body>
+    <script src = "libs/threeJS/three.min.js"></script>
+    <script src = "libs/arJS/build/ar-nft.js"></script>
+    <script>THREEx.ArToolkitContext.baseURL = "libs/arJS/"</script>
+
+    <script type= "module">
+        import { GLTFLoader } from '../libs/jsm/GLTFLoader.js';
+        
+        var scene, camera, renderer, clock;
+
+        var arToolkitSource, arToolkitContext;
+
+        var markerRoot;
+
+        var model;
+
+        init();
+        update();
+
+        function init()
+        {
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.Camera();
+            scene.add(camera);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+            });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.domElement.style.position = 'absolute';
+            renderer.domElement.style.top = '0px';
+            renderer.domElement.style.left = '0px';
+            document.body.appendChild( renderer.domElement );
+
+            clock = new THREE.Clock();
+
+            // ArToolkitSource
+            arToolkitSource = new THREEx.ArToolkitSource({
+                sourceType : 'webcam',
+                sourceWidth: 1280,
+                sourceHeight: 720,
+                displayWidth : 1280,
+                displayHeight: 720
+            })
+
+            function onResize(){
+                arToolkitSource.onResizeElement()
+                arToolkitSource.copyElementSizeTo(renderer.domElement)
+                if( arToolkitContext.arController !== null ){
+                    arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)
+                }
+            }
+
+            arToolkitSource.init(function onReady(){
+                // use a resize to fullscreen mobile devices
+                setTimeout(function() {
+                    onResize();
+                }, 1000);
+            })
+
+            // handle resize
+            window.addEventListener('resize', function(){
+                onResize();
+            })
+
+            // ArToolkitContext
+            arToolkitContext = new THREEx.ArToolkitContext({
+                cameraParametersUrl: "libs/arJS/data/camera_para.dat",
+                detectionMode: "color",
+            });
+
+            // copy projection matrix to camera when initialization complete
+            arToolkitContext.init( function onCompleted(){
+                camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
+            });
+
+            // Ar Marker
+            markerRoot = new THREE.Group();
+            scene.add(markerRoot);
+
+            var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+                type: "nft",
+                descriptorsUrl: "assets/dataNFT/coloring3d-bear-small",
+                smooth: true,
+                smoothCount : 10,
+                smoothTolerance : 0.01,
+                smoothThreshold : 5
+            })
+
+            var texture = new THREE.TextureLoader().load("assets/images/bird-render.png");
+            var alphaTexture = new THREE.TextureLoader().load("assets/images/bird-alpha.png")
+            texture.flipY = false;
+            alphaTexture.flipY = false;
+            var material = new THREE.MeshBasicMaterial({
+                    map : texture, 
+                    alphaMap : alphaTexture,
+                    alphaTest : 0.5,
+                    transparent : false,
+                    side: THREE.DoubleSide});
+
+            var videoTexture = new THREE.VideoTexture(arToolkitSource.domElement);
+            videoTexture.flipY = false;
+            var videoMaterial = new THREE.MeshBasicMaterial({map : videoTexture});
+           
+            // Place the model
+            const loader = new GLTFLoader().setPath("../assets/models/");
+
+            loader.load(
+                "bird.glb",
+                function(gltf)
+                {
+                    model = gltf.scene.children[0];
+                    model.name = "Bird";
+                    model.scale.set(30,30,30);
+                    model.position.set(130,130,-130);
+                    model.traverse((o) => {
+                        if (o.isMesh) o.material = material;
+                        });
+                    markerRoot.add(model);
+                },
+                    // called while loading is progressing
+                function ( xhr ) 
+                {
+                    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+                },
+
+                // called when loading has errors
+                function ( error ) 
+                {
+                    console.log( 'An error happened' );
+                }
+            )
+        }
+
+        function update()
+        {
+            requestAnimationFrame(update);
+
+            if(markerRoot.visible)
+            {
+                //model.rotation.z += 0.01;
+            }
+
+
+            // update artoolkit on every frame
+            if ( arToolkitSource.ready !== false )
+            {
+                arToolkitContext.update( arToolkitSource.domElement );
+            }
+                
+            renderer.render(scene, camera);
+        }
+
+    </script>
+</body>
+</html>
