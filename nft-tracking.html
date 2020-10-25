@@ -8,7 +8,7 @@
 </head>
 <body>
     <script src = "libs/threeJS/three.min.js"></script>
-    <script src = "https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-nft.js"></script>
+    <script src = "libs/arJS/build/ar-nft.js"></script>
     <script>THREEx.ArToolkitContext.baseURL = "libs/arJS/"</script>
 
     <script type= "module">
@@ -76,6 +76,10 @@
             // handle resize
             window.addEventListener('resize', function(){
                 onResize();
+            })
+
+            window.addEventListener('arjs-nft-loaded', function(ev){
+                console.log(ev);
             })
 
             // ArToolkitContext
