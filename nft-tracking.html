@@ -84,8 +84,8 @@
 
             // ArToolkitContext
             arToolkitContext = new THREEx.ArToolkitContext({
-                cameraParametersUrl: "libs/arJS/data/camera_para.dat",
-                detectionMode: "color",
+                cameraParametersUrl: 'libs/arJS/data/camera_para.dat',
+                detectionMode: 'mono',
             });
 
             // copy projection matrix to camera when initialization complete
@@ -98,8 +98,8 @@
             scene.add(markerRoot);
 
             var markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
-                type: "nft",
-                descriptorsUrl: "../assets/dataNFT/coloring3d-bear-small",
+                type: 'nft',
+                descriptorsUrl: '../assets/dataNFT/coloring3d-bear-small',
                 smooth: true,
                 smoothCount : 10,
                 smoothTolerance : 0.01,
